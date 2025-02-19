@@ -50,17 +50,18 @@ p_H0 <- df_clean %>%
   facet_grid(H0 ~ a,
              labeller = label_bquote(
                rows = .(H0) * "   (under " * H[0] * ")",
-               cols = a: .(a))
+               cols = "a ="~ .(a))
   ) +
   geom_abline(slope = 1, intercept = 0) +
   theme_bw() +
   theme(legend.position = "bottom") +
+  guides(color = guide_legend(nrow = 1)) +
   labs(x = "p-values", color = "Methods")+
   scale_color_manual(values = color_palette)
 # p_H0
 ggsave(plot = p_H0,
        filename = "figures/Figure11.pdf",
-       width = 8, height = 6)
+       width = 8, height = 4)
 
 ####### Figure 12 #######
 
@@ -85,11 +86,12 @@ p_ARI <- df_power %>%
   scale_color_manual(values = color_palette)  +
   theme_bw() +
   theme(legend.position = "bottom")+
+  guides(color = guide_legend(nrow = 1)) +
   labs(y = "Average of Adjusted Rand Index (through 500 experiments)", color = "Methods")
 # p_ARI
 ggsave( plot = p_ARI,
         filename = "figures/Figure12.pdf",
-        height = 6, width = 8)
+        height = 4, width = 8)
 
 ####### Figure 13 #######
 
@@ -105,7 +107,8 @@ df_power %>%
   scale_color_manual(values = color_palette)  +
   theme_bw() +
   theme(legend.position = "bottom")+
-  labs(y = "Statistical power (through 500 experiments)", color = "Methods") -> p_power
+  guides(color = guide_legend(nrow = 1)) +
+  labs(y = "Statistical power", color = "Methods") -> p_power
 # p_power
 ggsave(plot = p_power,
        filename = "figures/Figure13.pdf",

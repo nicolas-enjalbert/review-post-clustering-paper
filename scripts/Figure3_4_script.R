@@ -52,12 +52,12 @@ p_H0_ward <- df_clean %>%
         legend.box = "vertical") +
   scale_color_manual(values = color_palette) +
   scale_linetype_manual(values = linetype_palette) +
-  facet_grid(n ~ p,
-             labeller = label_bquote(cols = "m ="~ .(p),
-                                     rows = "n ="~ .(n))) +
+  facet_grid(p ~ n,
+             labeller = label_bquote(rows = "m ="~ .(p),
+                                     cols = "n ="~ .(n))) +
   labs(x = "p-values", color = "Methods", linetype = "Methods")
 # p_H0_ward
-ggsave(plot = p_H0_ward, "figure/Figure3.pdf", width = 8, height = 6)
+ggsave(plot = p_H0_ward, "figure/Figure3.pdf", width = 8, height = 4)
 
 
 ####### Figure 4 #######
@@ -77,15 +77,15 @@ p_power_ARI <- df_power %>%
   filter(p == 2) %>%
   pivot_longer(cols = c("power", "mean_ARI"), names_to = "categ",
                values_to = "Indicator") %>%
-  mutate(categ = recode(categ, "mean_ARI" = "Mean Adjusted Rand Index", .default = categ)) %>%
+  mutate(categ = recode(categ, "mean_ARI" = "Mean of ARI", .default = categ)) %>%
   mutate(categ = recode(categ, "power" = "Statistical power", .default = categ)) %>%
-  mutate(categ = factor(categ, levels = c("Statistical power", "Mean Adjusted Rand Index"))) %>%
+  mutate(categ = factor(categ, levels = c("Statistical power", "Mean of ARI"))) %>%
   ggplot(aes(x = a, y = Indicator, linetype = code,
              color = code)) +
   geom_point() + geom_line() +
   theme_bw() +
-  theme(legend.position = "bottom",
-        legend.box = "vertical") +
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(nrow = 1)) +
   scale_color_manual(values = color_palette) +
   scale_linetype_manual(values = linetype_palette) +
   labs(x = "a", color = "Methods", y = "",
@@ -94,4 +94,4 @@ p_power_ARI <- df_power %>%
              labeller = label_bquote(
                cols = "n ="~ .(n)))
 # p_power_ARI
-ggsave(plot = p_power_ARI, "figures/Figure4.pdf", width = 8, height = 6)
+ggsave(plot = p_power_ARI, "figures/Figure4.pdf", width = 8, height = 4)

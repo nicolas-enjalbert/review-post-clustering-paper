@@ -56,9 +56,9 @@ df_power <- df_clean %>%
 df_power %>%
   pivot_longer(cols = c("power", "mean_ARI"), names_to = "categ",
                values_to = "Indicator") %>%
-  mutate(categ = recode(categ, "mean_ARI" = "Mean Adjusted Rand Index", .default = categ)) %>%
+  mutate(categ = recode(categ, "mean_ARI" = "Mean of ARI", .default = categ)) %>%
   mutate(categ = recode(categ, "power" = "Statistical power", .default = categ)) %>%
-  mutate(categ = factor(categ, levels = c("Statistical power", "Mean Adjusted Rand Index"))) %>%
+  mutate(categ = factor(categ, levels = c("Statistical power", "Mean of ARI"))) %>%
   ggplot(aes(x = a, y = Indicator, linetype = code_inf_IS,
              color = code_inf_IS)) +
   geom_point() + geom_line() +
@@ -71,5 +71,5 @@ df_power %>%
        linetype = "Methods")+
   facet_grid(categ ~ method_clustering) -> p_ARI
 # p_ARI
-ggsave(plot = p_ARI, "figures/Figure16.pdf", width = 8, height = 6)
+ggsave(plot = p_ARI, "figures/Figure16.pdf", width = 8, height = 4)
 

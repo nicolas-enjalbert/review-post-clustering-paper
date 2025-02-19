@@ -60,12 +60,12 @@ p_prop_recover_clustering <- df_power %>%
              color = code_inf_IS)) +
   geom_point() + geom_line() +
   theme_bw() +
-  theme(legend.position = "bottom",
-        legend.box = "vertical") +
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(nrow = 1)) +
   facet_grid(n ~ p,
              labeller = label_bquote(rows = "n ="~ .(n),
                                      cols = "m ="~ .(p))) +
-  labs(x = "a", y = "Proportion of recovered clustering [through 500 experiments]",
+  labs(x = "a", y = "Proportion of recovered clustering",
        color = 'Dataset used', linetype = "Clustering method")
 ggsave(filename = "figure/Figure15.pdf",
        plot = p_prop_recover_clustering,

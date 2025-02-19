@@ -53,12 +53,12 @@ df_clean %>%
             mean_ARI = mean(ARI, na.rm = TRUE)) %>%
   pivot_longer(cols = c("power", "mean_ARI"), names_to = "categ",
                values_to = "Indicator") %>%
-  mutate(categ = recode(categ, "mean_ARI" = "Mean Adjusted Rand Index",
+  mutate(categ = recode(categ, "mean_ARI" = "Mean of ARI",
                         .default = categ)) %>%
   mutate(categ = recode(categ, "power" = "Statistical power",
                         .default = categ)) %>%
   mutate(categ = factor(categ, levels = c("Statistical power",
-                                          "Mean Adjusted Rand Index"))) %>%
+                                          "Mean of ARI"))) %>%
   ggplot(aes(x = a, y = Indicator,  color = epsilon)) +
   geom_point() + geom_line() +
   theme_bw() +
@@ -66,7 +66,7 @@ df_clean %>%
   labs(y = "", color = TeX("$\\epsilon$")) +
   facet_grid(categ ~ p,
              labeller = label_bquote(cols = "m ="~ .(p))) -> p_ARI_dt
-ggsave(plot = p_ARI_dt, "figures/Figure7.pdf", width = 8, height = 6)
+ggsave(plot = p_ARI_dt, "figures/Figure7.pdf", width = 8, height = 4)
 
 ####### Figure 17 #######
 
@@ -82,4 +82,4 @@ df_clean %>%
              labeller = label_bquote(cols = m~"="~ .(p),
                                      rows = n~"="~ .(n))) +
   labs(x = "p-values", color = TeX("$\\epsilon$")) -> p_dt_H0
-ggsave(plot = p_dt_H0, "figure/Figure17.pdf", width = 9, height = 4)
+ggsave(plot = p_dt_H0, "figure/Figure17.pdf", width = 9, height = 3)

@@ -94,8 +94,8 @@ df_power %>%
   scale_y_continuous(transform = "log10") +
   scale_color_manual(values = c("#00BFFF", "#208BB9", "#215B77", "#192F3B", "#000000")) +
   labs(y = "Computation time in sec.",
-       color = "Nb of Monte Carlo draws")+
-  facet_grid(method_clustering ~ p,
+       color = "Draws")+
+  facet_grid( . ~ p,
              labeller = label_bquote(cols = m~"="~ .(p))
   ) -> p_time_kmeans
 # p_time_kmeans

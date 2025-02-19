@@ -136,14 +136,14 @@ p_H0 <- df_H0 %>%
   stat_ecdf(linewidth = 1.2) +
   geom_abline(intercept = 0, slope = 1) +
   theme_bw() +
-  theme(legend.position = "bottom",
-        legend.box = "vertical") +
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(nrow = 1)) +
   facet_grid(p ~ n,
              labeller = label_bquote(rows = m~"="~ .(p),
                                      cols = n~"="~ .(n))) +
-  labs(x = "p-values", linetype = "Computation of the p-value", color = "gamma")
+  labs(x = "p-values", color = TeX("$\\gamma$"))
 p_H0
-ggsave(plot = p_H0, "figures/Figure18.pdf", height = 5, width = 7)
+ggsave(plot = p_H0, "figures/Figure18.pdf", height = 4, width = 8)
 
 
 
@@ -155,12 +155,13 @@ df_end %>%
   geom_boxplot() +
   theme_bw() +
   theme(legend.position = "bottom") +
+  guides(color = guide_legend(nrow = 1)) +
   facet_grid(p ~ n,
              labeller = label_bquote(rows = m~"="~ .(p),
                                      cols = n~"="~ .(n))) +
-  labs(y = "Accuracy rate", x = "gamma", color = "gamma") -> p_boxplot_alpha
+  labs(y = "Accuracy rate", x = TeX("$\\gamma$"), color = TeX("$\\gamma$")) -> p_boxplot_alpha
 p_boxplot_alpha
 ggsave(plot = p_boxplot_alpha,
        filename = "figures/Figure19.pdf",
-       height = 5,
-       width = 7)
+       height = 4,
+       width = 8)

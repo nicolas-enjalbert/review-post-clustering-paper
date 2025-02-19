@@ -49,8 +49,8 @@ p_H0_dependence <- df_clean %>%
              labeller = label_bquote(cols = rho~"="~ .(rho),
                                      rows = m~"="~ .(p))) +
   theme_bw() +
-  theme(legend.position = "bottom",
-        legend.box = "vertical") +
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(nrow = 1)) +
   scale_color_manual(values = color_palette) +
   scale_linetype_manual(values = linetype_palette) +
   labs(x = "p-values", color = "Methods", linetype = "Methods")

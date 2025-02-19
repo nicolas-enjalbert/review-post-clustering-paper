@@ -47,8 +47,8 @@ p_H0 <- df_clean %>%
   stat_ecdf(linewidth = 1.2) +
   geom_abline(intercept = 0, slope = 1) +
   theme_bw() +
-  theme(legend.position = "bottom",
-        legend.box = "vertical")  +
+  theme(legend.position = "bottom")  +
+  guides(color = guide_legend(nrow = 1)) +
   facet_grid(method_clustering ~ n,
              labeller = label_bquote(
                cols = n~"="~ .(n))) +
