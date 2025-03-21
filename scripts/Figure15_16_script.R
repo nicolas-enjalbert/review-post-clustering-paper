@@ -1,20 +1,24 @@
 library(tidyverse)
+library(latex2exp)
 source("scripts/R/script_simulation_multivariate-methods.R")
 
 setting <- 1
-path <- sprintf("results/simulation_multivariate_setting%s/Figure14/", setting)
+path <- sprintf(
+  "results/simulation_multivariate_setting%s/Figure15_16/",
+  setting
+)
 
 ####### Compute experiments #######
 comparison_multivariate_inference_methods(
-  methods = c("data.thinning", "Cond"),
-  clusterings = c("HAC", "kmeans", "GMM"),
-  nb_experiments = 5,
+  methods = c("data.thinning"),
+  clusterings = c("HAC"),
+  nb_experiments = 500,
   setting = setting,
   ns = c(100),
-  ps = c(2),
+  ps = c(2, 50, 100),
   as = c(0:10),
-  Ndraws = c(0, 1000),
-  epsilon_dts = c(0.7),
+  Ndraws = c(0),
+  epsilon_dts = c(0.1, 0.3, 0.5, 0.7, 0.9),
   sigmas = c(1),
   rhos = c(0),
   type_estimation = "known",
@@ -34,30 +38,48 @@ for (filename in filenames) {
 }
 
 data_cleaned <- clean_data(df_end)
-df_clean <- data_cleaned$df_clean
+df_clean <- data_cleaned$df_clean %>%
+  mutate(epsilon = as.factor(epsilon))
 color_palette <- data_cleaned$color_palette
 linetype_palette <- data_cleaned$linetype_palette
 color_palette_inf_IS <- data_cleaned$color_palette_inf_IS
 linetype_palette_inf_IS <- data_cleaned$linetype_palette_inf_IS
 
+####### Figure 15 #######
 
-####### Figure 14 #######
+df_clean %>%
+  filter(a == 0) %>%
+  ggplot(aes(x = pvaleur, color = epsilon)) +
+  stat_ecdf() +
+  geom_abline(intercept = 0, slope = 1) +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical"
+  ) +
+  facet_grid(n ~ p,
+    labeller = label_bquote(
+      cols = m ~ "=" ~ .(p),
+      rows = n ~ "=" ~ .(n)
+    )
+  ) +
+  labs(x = "p-values", color = TeX("$\\epsilon$")) -> p_dt_H0
+ggsave(plot = p_dt_H0, "figure/Figure15.pdf", width = 9, height = 3)
 
-df_power <- df_clean %>%
+####### Figure 16 #######
+
+df_clean %>%
   mutate(reject = pvaleur <= 0.05) %>%
   group_by(
-    n, p, a, ndraws, method_inference, method_clustering, exact, epsilon,
-    sigma, rho, method_inference_abre, method_clustering_abre,
-    code, code_inf_IS
+    n, p, a, ndraws, method_inference, method_clustering, exact,
+    epsilon
   ) %>%
   summarise(
     nb_exp = n(),
     power = mean(reject, na.rm = TRUE),
     mean_time = mean(time, na.rm = TRUE),
     mean_ARI = mean(ARI, na.rm = TRUE)
-  )
-
-p_ARI <- df_power %>%
+  ) %>%
   pivot_longer(
     cols = c("power", "mean_ARI"), names_to = "categ",
     values_to = "Indicator"
@@ -70,26 +92,17 @@ p_ARI <- df_power %>%
     "power" = "Statistical power",
     .default = categ
   )) %>%
-  mutate(categ = factor(categ,
-    levels = c("Statistical power", "Mean of ARI")
-  )) %>%
-  ggplot(aes(
-    x = a, y = Indicator, linetype = code_inf_IS,
-    color = code_inf_IS
-  )) +
+  mutate(categ = factor(categ, levels = c(
+    "Statistical power",
+    "Mean of ARI"
+  ))) %>%
+  ggplot(aes(x = a, y = Indicator, color = epsilon)) +
   geom_point() +
   geom_line() +
   theme_bw() +
-  theme(
-    legend.position = "bottom",
-    legend.box = "vertical"
-  ) +
-  scale_color_manual(values = color_palette_inf_IS) +
-  scale_linetype_manual(values = linetype_palette_inf_IS) +
-  labs(
-    x = "a", color = "Methods", y = "",
-    linetype = "Methods"
-  ) +
-  facet_grid(categ ~ method_clustering)
-# p_ARI
-ggsave(plot = p_ARI, "figures/Figure14.pdf", width = 8, height = 4)
+  theme(legend.position = "bottom") +
+  labs(y = "", color = TeX("$\\epsilon$")) +
+  facet_grid(categ ~ p,
+    labeller = label_bquote(cols = "m =" ~ .(p))
+  ) -> p_ARI_dt
+ggsave(plot = p_ARI_dt, "figures/Figure16.pdf", width = 8, height = 4)

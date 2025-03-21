@@ -2,18 +2,18 @@ library(tidyverse)
 source("scripts/R/script_simulation_multivariate-methods.R")
 
 setting <- 1
-path <- sprintf("results/simulation_multivariate_setting%s/Figure14/", setting)
+path <- sprintf("results/simulation_multivariate_setting%s/Figure13/", setting)
 
 ####### Compute experiments #######
 comparison_multivariate_inference_methods(
-  methods = c("data.thinning", "Cond"),
+  methods = c("data.thinning", "naif"),
   clusterings = c("HAC", "kmeans", "GMM"),
-  nb_experiments = 5,
+  nb_experiments = 500,
   setting = setting,
-  ns = c(100),
-  ps = c(2),
+  ns = c(10, 100, 500),
+  ps = c(2, 10, 50),
   as = c(0:10),
-  Ndraws = c(0, 1000),
+  Ndraws = c(0),
   epsilon_dts = c(0.7),
   sigmas = c(1),
   rhos = c(0),
@@ -40,56 +40,48 @@ linetype_palette <- data_cleaned$linetype_palette
 color_palette_inf_IS <- data_cleaned$color_palette_inf_IS
 linetype_palette_inf_IS <- data_cleaned$linetype_palette_inf_IS
 
-
-####### Figure 14 #######
+####### Figure 13 #######
 
 df_power <- df_clean %>%
-  mutate(reject = pvaleur <= 0.05) %>%
+  mutate(true_clustering = ARI == 1) %>%
   group_by(
     n, p, a, ndraws, method_inference, method_clustering, exact, epsilon,
-    sigma, rho, method_inference_abre, method_clustering_abre,
+    sigma, struc_cov, method_inference_abre, method_clustering_abre,
     code, code_inf_IS
   ) %>%
   summarise(
     nb_exp = n(),
-    power = mean(reject, na.rm = TRUE),
-    mean_time = mean(time, na.rm = TRUE),
-    mean_ARI = mean(ARI, na.rm = TRUE)
+    sum_true_clustering = sum(true_clustering),
+    prop_true_clustering = mean(true_clustering)
   )
 
-p_ARI <- df_power %>%
-  pivot_longer(
-    cols = c("power", "mean_ARI"), names_to = "categ",
-    values_to = "Indicator"
-  ) %>%
-  mutate(categ = recode(categ,
-    "mean_ARI" = "Mean of ARI",
-    .default = categ
-  )) %>%
-  mutate(categ = recode(categ,
-    "power" = "Statistical power",
-    .default = categ
-  )) %>%
-  mutate(categ = factor(categ,
-    levels = c("Statistical power", "Mean of ARI")
+p_prop_recover_clustering <- df_power %>%
+  mutate(code_inf_IS = recode(code_inf_IS,
+    "Naive" = "Entire dataset",
+    "DT" = "Thinned dataset"
   )) %>%
   ggplot(aes(
-    x = a, y = Indicator, linetype = code_inf_IS,
+    x = a, y = prop_true_clustering,
+    linetype = method_clustering_abre,
     color = code_inf_IS
   )) +
   geom_point() +
   geom_line() +
   theme_bw() +
-  theme(
-    legend.position = "bottom",
-    legend.box = "vertical"
+  theme(legend.position = "bottom") +
+  guides(color = guide_legend(nrow = 1)) +
+  facet_grid(n ~ p,
+    labeller = label_bquote(
+      rows = "n =" ~ .(n),
+      cols = "m =" ~ .(p)
+    )
   ) +
-  scale_color_manual(values = color_palette_inf_IS) +
-  scale_linetype_manual(values = linetype_palette_inf_IS) +
   labs(
-    x = "a", color = "Methods", y = "",
-    linetype = "Methods"
-  ) +
-  facet_grid(categ ~ method_clustering)
-# p_ARI
-ggsave(plot = p_ARI, "figures/Figure14.pdf", width = 8, height = 4)
+    x = "a", y = "Proportion of recovered clustering",
+    color = "Dataset used", linetype = "Clustering method"
+  )
+ggsave(
+  filename = "figure/Figure13.pdf",
+  plot = p_prop_recover_clustering,
+  height = 6, width = 8
+)
