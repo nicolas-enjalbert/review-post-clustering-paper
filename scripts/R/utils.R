@@ -418,7 +418,7 @@ estimation_cov <- function(X, cl, rho) {
       )) / (nk - 1)
       vec_sigma_k[k] <- sigma_k * nk
     }
-    sigma_intra <- sum(vec_sigma_k) / n
+    sigma_intra <- sum(vec_sigma_k) / (n -1)
     Sigma_intra <- sigma_intra * diag(p)
   } else {
     Sigma_all <- cov(X)
@@ -427,7 +427,7 @@ estimation_cov <- function(X, cl, rho) {
       nk <- length(which(cl == k))
       covmatrix <- covmatrix + cov(X[cl == k, ]) * nk
     }
-    Sigma_intra <- covmatrix / n
+    Sigma_intra <- covmatrix / (n - 1)
   }
   return(list(Sigma_all = Sigma_all, Sigma_intra = Sigma_intra))
 }
